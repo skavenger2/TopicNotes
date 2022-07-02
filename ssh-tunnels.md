@@ -25,7 +25,7 @@ ssh -D 1080 root@<ip>
 ## For proxying Traffic
 
 ```bash
-sudo vim /etc/proxychains.conf
+sudo vim /etc/proxychains4.conf
 
 # Enable Quiet Mode (Recommended): 
 # Uncomment (#quiet_mode)
@@ -35,5 +35,5 @@ quiet_mode
 socks4  127.0.0.1  1080
 
 # Back on the command line
-proxychains nmap -sV -Pn -n -iL targets.txt -oA results
+proxychains4 nmap -sV -Pn -n -iL targets.txt -oA results
 ```
