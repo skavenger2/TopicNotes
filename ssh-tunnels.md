@@ -19,7 +19,7 @@ ssh -D 1082
 ## For a Single Host
 
 ```bash
-ssh -D 1080 root@<ip>
+ssh -D 1080 root@<ip>   # add -N to not execute command (not necessary)
 ```
 
 ## For proxying Traffic
