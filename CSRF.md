@@ -1,7 +1,7 @@
 
-# SSRF
+# CSRF
 
-## Web SSRF
+## Web CSRF
 
 ```html
 <html>
@@ -17,7 +17,7 @@
 </html>
 ```
 
-## Web Socket SSRF
+## Cross Site Web Socket Hijacking
 
 ```html
 <html>
