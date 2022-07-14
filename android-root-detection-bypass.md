@@ -72,7 +72,7 @@ Need:
 `frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js_on_your_computer> --no-paus`  
 5. Open the application
 
-## Alt Frida
+## Alt Frida - Known to work
 
 <https://dl.packetstormsecurity.net/papers/general/rootdetection-bypass.pdf>  
 
