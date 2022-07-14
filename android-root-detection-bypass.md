@@ -1,13 +1,50 @@
 
 # List of resources to get started
 
-https://medium.com/@cintainfinita/android-how-to-bypass-root-check-and-certificate-pinning-36f74842d3be  
-https://stackoverflow.com/questions/68661134/root-detection-implementation-can-be-bypassed-using-magisk-hide-android-app-vu  
-https://redfoxsec.com/blog/android-root-detection-bypass-using-frida/  
-https://www.androidworld.org/bypass-apps-root-detection-in-android/136/  
-https://www.bollyinside.com/articles/how-to-bypass-apps-root-detection-in-android-device/  
+## Frida 1 - Known to work
 
----
+<https://frida.re/docs/android/>  
+<https://dl.packetstormsecurity.net/papers/general/rootdetection-bypass.pdf>  
+
+1. Install objection
+    - sudo pip3 install objection (<https://github.com/sensepost/objection>)
+        - Make sure the app is open on the device, otherwise objection won't work
+2. Install frida-push  
+`sudo pip3 install frida-push`  
+3. Download the latest frida-server for Android from the [releases page](https://github.com/frida/frida/releases) and uncompress it.  
+`unxz <frida-server.xz>`  
+4. Move it to the android device  
+`adb push frida-server /data/local/tmp/`  
+`adb shell "chmod 755 /data/local/tmp/frida-server"`  
+`adb shell "/data/local/tmp/frida-server &"`  
+6. Run following commands to find the package name and connect the application to objection and explore the app  
+`Frida-ps -Ua`  
+`objection --gadget package_name explore`  
+OR  
+`adb shell ps | grep <app name>`  
+`objection --gadget package_name explore`  
+5. Run the following command to disable root  
+`android root disable`  
+
+## Frida 2
+
+<https://redfoxsec.com/blog/android-root-detection-bypass-using-frida/>  
+
+Need:  
+- Rooted device/emulator
+- Platform-tools
+- Frida packages for Python
+- Target app
+
+1. List processes with Frida  
+`frida-ps -Uai`  
+2. Inject [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script into the process  
+`adb push <path_to_fridantiroot.js> /data/local/tmp`  
+3. Run the following command on the device to start the frida-server  
+`adb shell /data/local/tmp/frida-server &`   
+4. Inject fridantiroot.js script into the target application  
+`frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js_on_your_computer> --no-paus`  
+5. Open the application
 
 ## Xposed
 
@@ -52,46 +89,3 @@ https://www.bollyinside.com/articles/how-to-bypass-apps-root-detection-in-androi
 `keytool -keygen -v -keystore my-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity10000`  
 6. Install the new version
 
-## Frida 1 - Known to work
-
-<https://dl.packetstormsecurity.net/papers/general/rootdetection-bypass.pdf>  
-
-1. Install objection
-    - sudo pip3 install objection (<https://github.com/sensepost/objection>)
-        - Make sure the app is open on the device, otherwise objection won't work
-2. Install frida-push  
-`sudo pip3 install frida-push`  
-3. Download the latest frida-server for Android from the [releases page](https://github.com/frida/frida/releases) and uncompress it.  
-`unxz <frida-server.xz>`  
-4. Move it to the android device  
-`adb push frida-server /data/local/tmp/`  
-`adb shell "chmod 755 /data/local/tmp/frida-server"`  
-`adb shell "/data/local/tmp/frida-server &"`  
-6. Run following commands to find the package name and connect the application to objection and explore the app  
-`Frida-ps -Ua`  
-`objection --gadget package_name explore`  
-OR  
-`adb shell ps | grep <app name>`  
-`objection --gadget package_name explore`  
-5. Run the following command to disable root  
-`android root disable`  
-
-## Frida 2
-
-<https://redfoxsec.com/blog/android-root-detection-bypass-using-frida/>  
-
-Need:  
-- Rooted device/emulator
-- Platform-tools
-- Frida packages for Python
-- Target app
-
-1. List processes with Frida  
-`frida-ps -Uai`  
-2. Inject [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script into the process  
-`adb push <path_to_fridantiroot.js> /data/local/tmp`  
-3. Run the following command on the device to start the frida-server  
-`adb shell /data/local/tmp/frida-server &`   
-4. Inject fridantiroot.js script into the target application  
-`frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js_on_your_computer> --no-paus`  
-5. Open the application
