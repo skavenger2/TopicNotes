@@ -52,27 +52,7 @@ https://www.bollyinside.com/articles/how-to-bypass-apps-root-detection-in-androi
 `keytool -keygen -v -keystore my-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity10000`  
 6. Install the new version
 
-## Frida
-
-<https://redfoxsec.com/blog/android-root-detection-bypass-using-frida/>  
-
-Need:  
-- Rooted device/emulator
-- Platform-tools
-- Frida packages for Python
-- Target app
-
-1. List processes with Frida  
-`frida-ps -Uai`  
-2. Inject [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script into the process  
-`adb push <path_to_fridantiroot.js> /data/local/tmp`  
-3. Run the following command on the device to start the frida-server  
-`adb shell /data/local/tmp/frida-server &`   
-4. Inject fridantiroot.js script into the target application  
-`frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js_on_your_computer> --no-paus`  
-5. Open the application
-
-## Alt Frida - Known to work
+## Frida 1 - Known to work
 
 <https://dl.packetstormsecurity.net/papers/general/rootdetection-bypass.pdf>  
 
@@ -95,3 +75,23 @@ OR
 `objection --gadget package_name explore`  
 5. Run the following command to disable root  
 `android root disable`  
+
+## Frida 2
+
+<https://redfoxsec.com/blog/android-root-detection-bypass-using-frida/>  
+
+Need:  
+- Rooted device/emulator
+- Platform-tools
+- Frida packages for Python
+- Target app
+
+1. List processes with Frida  
+`frida-ps -Uai`  
+2. Inject [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script into the process  
+`adb push <path_to_fridantiroot.js> /data/local/tmp`  
+3. Run the following command on the device to start the frida-server  
+`adb shell /data/local/tmp/frida-server &`   
+4. Inject fridantiroot.js script into the target application  
+`frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js_on_your_computer> --no-paus`  
+5. Open the application
