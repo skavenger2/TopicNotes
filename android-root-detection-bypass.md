@@ -81,9 +81,13 @@ Need:
         - Make sure the app is open on the device, otherwise objection won't work
 2. Install frida-push  
 `sudo pip3 install frida-push`  
-3. Run the following command to install frida-server on the android device  
-`frida-push`  
-4. Run following commands to find the package name and connect the application to objection and explore the app  
+3. Download the latest frida-server for Android from the [releases page](https://github.com/frida/frida/releases) and uncompress it.  
+`unxz <frida-server.xz>`  
+4. Move it to the android device  
+`adb push frida-server /data/local/tmp/`  
+`adb shell "chmod 755 /data/local/tmp/frida-server"`  
+`adb shell "/data/local/tmp/frida-server &"`  
+6. Run following commands to find the package name and connect the application to objection and explore the app  
 `Frida-ps -Ua`  
 `objection --gadget package_name explore`  
 OR  
