@@ -55,9 +55,13 @@ Need:
 `frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js> --no-paus`  
 7. Open the application
 
-## Patching
+## Patching Smali
 
-Decoompile the APK file with APKTool  
+Reference: <https://medium.com/swlh/defeating-android-root-detection-with-smali-patching-46c082c27a81>  
+
+---
+
+Decompile the APK file with APKTool  
 
 `apktool d <application.apk>`  
 
@@ -127,6 +131,9 @@ Becomes:
 
 *Note the added "return-void" after ".line 1072"*  
 This bypasses all string checks by returning before they occur.  
+
+Recompile the APK. The VSCode extension "APKLab" is very useful.  
+Install the recompiled APK on the android device, it should now run.  
 
 ## Xposed
 
