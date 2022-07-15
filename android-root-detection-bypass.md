@@ -62,8 +62,8 @@ unxz <frida-server.xz>
 3. Move frida-server to the android device  
 ```bash
 adb push frida-server /data/local/tmp/
-`adb shell "chmod 755 /data/local/tmp/frida-server"
-`adb shell "/data/local/tmp/frida-server &"
+adb shell "chmod 755 /data/local/tmp/frida-server"
+adb shell "/data/local/tmp/frida-server &"
 ```
 4. Copy [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script to a file on your local system  
 - [Alternate fridantiroot](https://gist.github.com/pich4ya/0b2a8592d3c8d5df9c34b8d185d2ea35)  
