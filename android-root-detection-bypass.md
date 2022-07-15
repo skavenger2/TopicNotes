@@ -1,7 +1,7 @@
 
 # List of resources to get started
 
-## Frida 1 - Known to work
+## Frida 1
 
 <https://frida.re/docs/android/>  
 <https://dl.packetstormsecurity.net/papers/general/rootdetection-bypass.pdf>  
