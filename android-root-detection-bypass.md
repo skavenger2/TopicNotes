@@ -6,14 +6,14 @@
 <https://frida.re/docs/android/>  
 <https://dl.packetstormsecurity.net/papers/general/rootdetection-bypass.pdf>  
 
-1. Install objection
-    - sudo pip3 install objection (<https://github.com/sensepost/objection>)
-        - Make sure the app is open on the device, otherwise objection won't work
+1. Install objection (<https://github.com/sensepost/objection>)  
+`sudo pip3 install objection`  
 2. Install frida-push  
 `sudo pip3 install frida-push`  
-3. Download the latest frida-server for Android from the [releases page](https://github.com/frida/frida/releases) and uncompress it.  
+3. Attempt to open the target app on the device to ensure the process is running  
+4. Download the latest frida-server for Android from the [releases page](https://github.com/frida/frida/releases) and uncompress it.  
 `unxz <frida-server.xz>`  
-4. Move it to the android device  
+5. Move it to the android device  
 `adb push frida-server /data/local/tmp/`  
 `adb shell "chmod 755 /data/local/tmp/frida-server"`  
 `adb shell "/data/local/tmp/frida-server &"`  
@@ -23,7 +23,7 @@
 OR  
 `adb shell ps | grep <app name>`  
 `objection --gadget package_name explore`  
-5. Run the following command to disable root  
+6. Run the following command to disable root  
 `android root disable`  
 
 ## Frida 2
@@ -33,18 +33,23 @@ OR
 Need:  
 - Rooted device/emulator
 - Platform-tools
-- Frida packages for Python
+- Frida packages for Python  
+`sudo pip3 install frida-push`  
 - Target app
 
-1. List processes with Frida  
+1. Attempt to open the app (required so that the process is running)
+2. Download the latest frida-server for Android from the frida [releases page](https://github.com/frida/frida/releases) and uncompress it.  
+`unxz <frida-server.xz>`  
+3. Move frida-server to the android device  
+`adb push frida-server /data/local/tmp/`  
+`adb shell "chmod 755 /data/local/tmp/frida-server"`  
+`adb shell "/data/local/tmp/frida-server &"`  
+4. Copy [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script to a file on your local system  
+5. List processes with Frida  
 `frida-ps -Uai`  
-2. Inject [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script into the process  
-`adb push <path_to_fridantiroot.js> /data/local/tmp`  
-3. Run the following command on the device to start the frida-server  
-`adb shell /data/local/tmp/frida-server &`   
-4. Inject fridantiroot.js script into the target application  
-`frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js_on_your_computer> --no-paus`  
-5. Open the application
+6. Inject fridantiroot.js script into the target application  
+`frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js> --no-paus`  
+7. Open the application
 
 ## Xposed
 
