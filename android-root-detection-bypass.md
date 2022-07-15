@@ -1,6 +1,9 @@
 
 # List of resources to get started
 
+Root Android Studio AVD with SuperSU  
+<https://github.com/0xFireball/root_avd>  
+
 ## Frida 1
 
 <https://frida.re/docs/android/>  
@@ -45,6 +48,7 @@ Need:
 `adb shell "chmod 755 /data/local/tmp/frida-server"`  
 `adb shell "/data/local/tmp/frida-server &"`  
 4. Copy [this](https://codeshare.frida.re/@dzonerzy/fridantiroot/) antiroot script to a file on your local system  
+- [Alternate fridantiroot](https://gist.github.com/pich4ya/0b2a8592d3c8d5df9c34b8d185d2ea35)  
 5. List processes with Frida  
 `frida-ps -Uai`  
 6. Inject fridantiroot.js script into the target application  
