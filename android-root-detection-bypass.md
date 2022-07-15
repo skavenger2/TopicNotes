@@ -55,6 +55,79 @@ Need:
 `frida -U -f <your_application_package_name> -l <path_to_fridantiroot.js> --no-paus`  
 7. Open the application
 
+## Patching
+
+Decoompile the APK file with APKTool  
+
+`apktool d <application.apk>`  
+
+Open this source code in a text editor  
+
+Search for any of the following strings:  
+
+- test-keys
+- su
+- Superuser.apk
+- eu.chainfire.supersu
+- com.noshufou.android.su
+- com.thirdparty.superuser
+- com.koushikdutta.superuser
+- com.zachspong.temprootremovejb
+- com.ramdroid.appquarantine
+- stericson.busybox
+- Superuser
+- SuperSU
+
+Most likely, these are all in the one method of smali code.  
+Find the start of this method, for example:  
+
+`.method public static a(Landroid/app/Activity;)V`  
+
+Take note of the trailing character and find out what it wants. In this case, "V", return void.  
+To bypass the root check, find the first line of code in this method and add some just before it.  
+For example, this code:  
+
+```smali
+.method public static a(Landroid/app/Activity;)V
+    .locals 9
+
+    .prologue
+    const/4 v1, 0x1
+
+    const/4 v0, 0x0
+
+    .line 57
+    .line 1072
+    invoke-static {}, Landroid/os/SystemClock;->elapsedRealtime()J
+
+    move-result-wide v4
+    
+    # Root checks continue...
+```
+
+Becomes:  
+
+```smali
+.method public static a(Landroid/app/Activity;)V
+    .locals 9
+
+    .prologue
+    const/4 v1, 0x1
+
+    const/4 v0, 0x0
+
+    .line 57
+    .line 1072
+    return-void
+
+    invoke-static {}, Landroid/os/SystemClock;->elapsedRealtime()J
+
+    move-result-wide v4
+```
+
+*Note the added "return-void" after ".line 1072"*  
+This bypasses all string checks by returning before they occur.  
+
 ## Xposed
 
 1. Install Xposed:  
