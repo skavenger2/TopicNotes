@@ -17,7 +17,7 @@ Tamper the payload to what you need.
 
 Decode and change the "Payload", the server may not be checking it anyway.  
 
-## Crack with Hashcat
+## Crack with Hashcat (HMAC - HS256)
 
 Copy the original JWT to a text file and run Hashcat against it:  
 
