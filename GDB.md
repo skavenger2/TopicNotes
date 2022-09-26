@@ -154,7 +154,16 @@ Example ~/gdbCfg:
 
 ```bash
 display/10i $rip
-display/10xg $rsp
+display/x $rbp
+display/x $rsp
 display/x $rax
+display/x $rbx
+display/x $rcx
+display/x $rdx
+display/x $rdi
+display/x $rsi
+display/x $r8
+display/x $r9
+display/10gx $rsp
 start
 ```
