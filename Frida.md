@@ -1,5 +1,8 @@
 # Frida
 
+Frida Javascript API documentation: <https://frida.re/docs/javascript-api/#java>  
+Good talk with simple examples: <https://www.youtube.com/watch?v=iMNs8YAy6pk>  
+
 Frida-server link [here](https://github.com/frida/frida/releases)  
 Decompress with `unxz`  
 
@@ -116,6 +119,53 @@ Once tested, bundle it into an agent
 
 `frida -l agent.js [target]`  
 
+## Root Detection on Android Startup
+
+Using: <https://github.com/OWASP/owasp-mastg/blob/master/Crackmes/Android/Level_01/UnCrackable-Level1.apk>  
+Reference: <https://nibarius.github.io/learning-frida/2020/05/16/uncrackable1>  
+
+Root detection is performed as soon as the application is opened. You cannot hook with frida until the app has started.  
+Start the app with frida and suppress the root detection message:  
+
+```javascript
+Java.perform(function() {	// invoke API
+	// Use the main activitiy in the application and store the result of the method called "a", in "s"
+	Java.use("sg.vantagepoint.uncrackable1.MainActivity".a.implementation = function(s) {
+		// print that "a" was suppressed and what the original message was
+		console.log("Tamper detection suppressed, message was: " + s);
+	}
+});
+```
+
+Then run `frida -U --no-pause -l script.js -f <target package name>`  
+
+### Getting a secret
+
+Continuing from the root detection above, Get values from a function that decodes a string into a byte array  
+Add the following code to the above script  
+
+```javascript
+ 	function bufferToString(buf) {
+		// create a byte array from the passed value
+    		var buffer = Java.array('byte', buf);
+    		var result = "";
+		// loop over the byte array, converting each character to a string
+    		for(var i = 0; i < buffer.length; ++i){
+      			result += (String.fromCharCode(buffer[i] & 0xff));
+    		}
+		// return the string
+    		return result;
+  	}
+  	
+	//  stave the original implementation of sg.vantagepoint.a.a.a
+  	Java.use("sg.vantagepoint.a.a").a.implementation = function(ba1, ba2) {
+		// convert the value
+		const retval = this.a(ba1, ba2);
+    		console.log("secret code is: " + bufferToString(retval));
+    		return retval;
+  	}
+```
+
 ## Tracing Java methods on Android  
 
 no support yet for matching Java methods in frida-trace  
@@ -145,3 +195,16 @@ How can we use agents
 
 BlueCrawl collects metadata from a device
 - leverages CLI for easy script injection
+
+## Manual Fun When Hooked by Frida
+
+```bash
+Process.enumerateModules()
+Process.findModuleByName("name.so")
+Process.findModuleByName("name.so").enumerateExports()
+Process.findModuleByName("name.so").enumerateImports()	// look for juicy things like strncmp
+```
+
+## Frida Code Snippets
+
+<https://erev0s.com/blog/frida-code-snippets-for-android/>  
