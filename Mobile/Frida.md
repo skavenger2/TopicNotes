@@ -245,7 +245,7 @@ Java.perform(function() {
 });
 ```
 
-Create a loop:  
+PIN bruteforce:  
 
 ```javascript
 Java.perform(function() {
@@ -264,6 +264,18 @@ Java.perform(function() {
                 console.log("Done");
         }
 });
+```
+
+PIN bruteforce 2:  
+
+```javascript
+	for (var i = 0; i < 10000; i++) {
+		if (chall07.check07Pin(String(i).padStart(4, '0'))) {
+			main.chall07(String(i).padStart(4, '0'));
+			console.log("Found the PIN: " + String(i).padStart(4, '0'));
+			break;
+		}
+	}
 ```
 
 Hook a method and execute normally but save results:  
@@ -286,3 +298,37 @@ Java.perform(function() {
         }
 });
 ```
+
+Set values:  
+
+```javascript
+Java.perform(function() {
+        var chall1 = Java.use("uk.rossmarks.fridalab.challenge_01")
+        chall1.chall01.value = 1;
+
+});
+```
+
+Call function that is not executed normally:  
+
+```javascript
+Java.perform(function() {
+        var main;	// global var
+        Java.choose("uk.rossmarks.fridalab.MainActivity", {	// select the main activity
+                onMatch: function (instance) {	// look for all instances? I'm not entirely sure
+                        main = instance;	// set main variable
+                },
+                onComplete: function () {}
+        });
+        main.chall02();		// start the function name from the list found in Java.choose 
+
+});
+```
+
+## References
+
+<https://frida.re/docs/javascript-api/#java>  
+<https://www.youtube.com/watch?v=iMNs8YAy6pk>  
+<https://erev0s.com/blog/frida-code-snippets-for-android/>  
+<https://nibarius.github.io/learning-frida/>  
+<https://www.shielder.com/it/blog/2019/02/fridalab-writeup/>  
