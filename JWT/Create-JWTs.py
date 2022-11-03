@@ -20,9 +20,3 @@ payload = {
 }
 
 print(jwt.encode(payload, key, algorithm="HS256"))
-
-
-#
-# RS256
-#
-        
