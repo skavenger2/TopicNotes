@@ -1,4 +1,4 @@
-# readme
+# README
 
 Script utilises Nahamsecs [video](https://www.youtube.com/watch?v=yffOjRhvhZw)  
 
