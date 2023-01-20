@@ -46,6 +46,14 @@ Get-NetGroup -FullData
 Invoke-ShareFinder -Verbose    # find shares on hosts in current domain   # LDAP lookup
 Invoke-FileFinder -Verbose    # find sensitive files on computers in the domain   # LDAP lookup
 Get-NetFileServer -Verbose    # find fileservers in the domain    # LDAP lookup
+
+## Alternate ##
+# On Windows machine with PowerView:
+Get-NetComputer | select SamAccountName
+# On Linux machine
+smbclient -N -L \\\\{machine name}\\
+# With creds
+smbclient -L \\\\{machine name}\\ -U {username} -P
 ```
 
 ## PowerView Functions for the Local Machine
