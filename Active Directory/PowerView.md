@@ -1,15 +1,56 @@
-# Red Team Enumeration
+# PowerView
 
-## Enumerating Domain
+## Downlaod
 
-Current domain information
+<https://github.com/PowerShellMafia/PowerSploit/blob/master/Recon/PowerView.ps1>
+
+## AD Recon
+
 ```powershell
-[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
+# .NET classes
+$ADClass = [System.DirectoryServices.ActiveDirectory.Domain]
+$ADClass::GetCurrentDomain()
+
+Get-NetDomain -Domain moneycorp.local   # the .NET commands above are equal to PowerView's Get-NetDomain
+Get-DomainSID   # LDAP lookup
+Get-NetComputer   # LDAP lookup
+Get-NetDomainController   # Possibly local query
+Get-NetDomainTrust    # LDAP lookup
+Get-NetForstTrust   # LDAP lookup
+```
+
+## User Recon
+
+```powershell
+# cmd.exe
+net user /domain
+net user /domain username   # replace 'username' with a username you want more details for
+
+# PowerView
+Get-NetUser   # LDAP lookup
+Get-NetUser | select SamAccountName
+Get-NetUser -Username name1
+
+Get-NetGroup | select name   # list group names in domain   # LDAP lookup
+Get-NetGroup 'Domain Admins'     # for a single group's info
+Get-NetGroup '*admin*'     # same as above but for any group name that contains the keyword admin
+# Groups such as 'Enterprise admins' are only available on the Forest root DC, ie. Get-NetGroup '*admin*' -Domain moneycorp.local
+Get-NetGroup -Domain <targetdomain>     # for trusted domains
+Get-NetGroup -FullData
+```
+
+## Share Recon
+
+```powershell
+# PowerView
+Invoke-ShareFinder -Verbose    # find shares on hosts in current domain   # LDAP lookup
+Invoke-FileFinder -Verbose    # find sensitive files on computers in the domain   # LDAP lookup
+Get-NetFileServer -Verbose    # find fileservers in the domain    # LDAP lookup
 ```
 
 ## PowerView Functions for the Local Machine
 
-```txt
+```
 Get-NetLocalGroup                   -   enumerates the local groups on the local (or remote) machine
 Get-NetLocalGroupMember             -   enumerates members of a specific local group on the local (or remote) machine
 Get-NetShare                        -   returns open shares on the local (or a remote) machine
