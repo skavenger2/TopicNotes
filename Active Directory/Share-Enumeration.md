@@ -17,6 +17,7 @@ Quiet
 ```powershell
 # Local shares
 get-smbshare
+Get-WmiObject -Class win32_share
 ```
 
 ## PowerView
@@ -27,7 +28,9 @@ Noisy
 # With PowerView imported
 Find-DomainShare
 # OR
-Invoke-ShareFinder
+Invoke-ShareFinder -Verbose    # find shares on hosts in current domain   # LDAP lookup
+Invoke-FileFinder -Verbose    # find sensitive files on computers in the domain   # LDAP lookup
+Get-NetFileServer -Verbose    # find fileservers in the domain    # LDAP lookup
 ```
 
 ## CrackMapExec
