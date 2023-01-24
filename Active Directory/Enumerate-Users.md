@@ -1,6 +1,6 @@
 # Options to Enumerate Users
 
-## Net
+## NET
 
 ```cmd
 # Query the current domain DC
@@ -13,9 +13,18 @@ net user <username /domain
 net user
 ```
 
+## WMIC
+
+Admin required for WMI
+
+```cmd
+wmic useraccount list
+```
+
 ## Powershell
 
 Quiet  
+Admin required for WMI  
 <https://0xinfection.github.io/posts/wmi-recon-enum/>  
 <https://0xinfection.github.io/posts/wmi-ad-enum/>  
 
@@ -31,7 +40,6 @@ Get-WmiObject -Class win32_useraccount | select name, domain, accounttype
 
 # domain groups
 Get-WmiObject -Class win32_group
-
 ```
 
 ## PowerView
