@@ -1,6 +1,5 @@
 # Add Certificate to Burpsuite to Proxy Traffic
 
-
 ```bash
 openssl x509 -inform DER -in cacert.der -out cacert.pem
 openssl x509 -inform PEM -subject_hash_old -in cacert.pem | head -1
@@ -14,3 +13,5 @@ cp /sdcard/Download/9a5ba575.0 /system/etc/security/cacerts/
 chmod 644 /system/etc/security/cacerts/9a5ba575.0
 reboot
 ```
+
+Ensure burpsuite is intercepting on all interfaces
