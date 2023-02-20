@@ -22,3 +22,10 @@ I.e. an address leaked in the `libc` region is only good for the `libc` region, 
 **Position Indipendant Executable**  
 PIE is very similar to ASLR but for the actual binary's code/memory regions.  
 The exploit is the same as ASLR: Leak an address and calculate the offset to your target.  
+
+
+---
+
+## Challs That Give You a Leak
+
+### Csaw 2017 pilot
