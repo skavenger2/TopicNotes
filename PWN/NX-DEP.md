@@ -72,7 +72,7 @@ Pwntools ROP documentation: <https://docs.pwntools.com/en/latest/rop/rop.html>
 <https://github.com/Gallopsled/pwntools-tutorial/blob/master/rop.md>  
 
 Overflow a buffer to control the EIP/RIP.  
-From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers.  
+From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers, followed by an `int 0x80` toswitch to kernel mode and execute the system call.  
 
 You can view the available gadgets in a program with `ropper`  
 E.g. `ropper -f vuln` to view all of the gadgets in a binary.  
