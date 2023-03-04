@@ -70,10 +70,28 @@ If you need to pass as a command line arg you can use `(cat payload.txt; cat) | 
 
 Pwntools ROP documentation: <https://docs.pwntools.com/en/latest/rop/rop.html>  
 <https://github.com/Gallopsled/pwntools-tutorial/blob/master/rop.md>  
+Stephen Sims - Return Oriented Shellcode (SANS SEC760 Content)  
+<https://www.youtube.com/watch?v=7BMyVvYv5d0>  
+Automate finding gadgets <https://github.com/packz/ropeme>  
 
 Overflow a buffer to control the EIP/RIP.  
 From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers, followed by an `int 0x80` toswitch to kernel mode and execute the system call.  
 
 You can view the available gadgets in a program with `ropper`  
 E.g. `ropper -f vuln` to view all of the gadgets in a binary.  
+
+
+**Calling execve():**  
+- AL register needs to hold 0x0b
+- BX register needs to hold a pointer to your arg for the system call
+- CX register points to the arg vector ARGV pointer array
+- DX register points to the ENVP array (Environment Variable Pointer)
+
+If the program has an mmap() function, you need to find rop gadgets **after** the mmap() has occurred to ensure the gadgets do exist in memory.  
+- You can then use `ltrace` to view the address where mmap is mapped and add instuction offsets
+- Validate by hitting a breakpoint in gdb and addid the 2 values, then `x/i $addr`
+
+
+
+
 
