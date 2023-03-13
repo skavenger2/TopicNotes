@@ -167,3 +167,29 @@ display/x $r9
 display/10gx $rsp
 start
 ```
+
+## Searching in PwnDBG
+
+<https://browserpwndbg.readthedocs.io/en/docs/commands/procinfo/search/>  
+
+```bash
+search <value>
+```
+
+| Optional | Argument	Info |
+| --- | --- |
+| --help | show this help message and exit|
+| --type {byte,short,word,dword,qword,pointer,string,bytes} | Size of search target (default: bytes) |
+| --byte | Search for a 1-byte integer |
+| --word,short | Search for a 2-byte integer |
+| --dword	| Search for a 4-byte integer |
+| --qword	| Search for an 8-byte integer |
+| --pointer	| Search for a pointer-width integer |
+| --hex	| Target is a hex-encoded (for bytes/strings) (default: False) |
+| --string | Target is a raw string (default: False) |
+| --executable | Search executable segments only (default: False) |
+| --writable | Search writable segments only (default: False) |
+| --save | Save results for --resume. Default comes from config 'auto_save_search' |
+| --no-save | Invert --save |
+| --next | Search only locations returned by previous search with --save (default: False) |
+
