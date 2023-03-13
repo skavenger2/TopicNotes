@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Solution for ROP Emporium level 2: split
+Solution for ROP Emporium level 2: split (32 bit)
 """
 
 from pwn import *
