@@ -37,6 +37,21 @@ run
 search /bin   # search for strings that contain "/bin" - adjust as needed
 ```
 
+4.5. Automate searching for strings
+
+```python3
+context.binary = elf = ELF('/bin/sh')
+libc = elf.libc
+
+elf.address = 0xAA000000
+libc.address = 0xBB000000
+
+rop = ROP([elf, libc])
+
+binsh = next(libc.search(b"/bin/sh\x00"))
+rop.execve(binsh, 0, 0)
+```
+
 5. Use ROP in pwntools to create a ropchain which can be placed into your payload
 
 ```python3
