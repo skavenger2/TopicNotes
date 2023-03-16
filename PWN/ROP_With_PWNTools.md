@@ -55,6 +55,7 @@ rop.execve(binsh, 0, 0)
 5. Use ROP in pwntools to create a ropchain which can be placed into your payload
 
 The chain that is printed can be pulled apart and manipulated, e.g. if alternate addresses need to be used  
+You can also build your payload manually, using the output of rop.dump() to guide you (I have had more success with this method than with rop.chain())
 
 ```python3
 # Using system("/bin/cat flag.txt) as an example
