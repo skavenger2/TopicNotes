@@ -17,6 +17,8 @@ Get-NetComputer   # LDAP lookup
 Get-NetDomainController   # Possibly local query
 Get-NetDomainTrust    # LDAP lookup
 Get-NetForstTrust   # LDAP lookup
+
+Get-DomainComputer -SPN mssql*  # Find SQL servers
 ```
 
 ## User Recon
