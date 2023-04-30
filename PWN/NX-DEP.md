@@ -75,7 +75,7 @@ Stephen Sims - Return Oriented Shellcode (SANS SEC760 Content)
 Automate finding gadgets <https://github.com/packz/ropeme>  
 
 Overflow a buffer to control the EIP/RIP.  
-From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers, followed by an `int 0x80` toswitch to kernel mode and execute the system call.  
+From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers, followed by an `int 0x80` to switch to kernel mode and execute the system call.  
 
 You can view the available gadgets in a program with `ropper`  
 E.g. `ropper -f vuln` to view all of the gadgets in a binary.  
@@ -91,7 +91,42 @@ If the program has an mmap() function, you need to find rop gadgets **after** th
 - You can then use `ltrace` to view the address where mmap is mapped and add instuction offsets
 - Validate by hitting a breakpoint in gdb and addid the 2 values, then `x/i $addr`
 
+## Write What Where
 
+Gadgets that allow you to store data in memory, i.e. create a pointer to an argument.  
+ 
+E.g.  
 
+```asm
+# Basic and best example
+mov [rdi], rsi; ret;
 
+# Alternative:
+xchg byte ptr [rdi], bl; ret;
+```
 
+## Writeable Locations
+
+Find writable sections with `readelf -S -W ./vuln`  
+Use pwntools to reference section addresses:  
+```python
+from pwn import *
+context.binary = elf = ELF("./vuln")
+print(elf.symbols)
+```
+
+**.data** stores initialised variables.  
+The address of .data can be found with:  
+```python
+from pwn import *
+context.binary = elf = ELF("./vuln")
+data_section = elf.symbols.data_start
+```
+
+**.bss** stores uninitialised variables.  
+The address of .bss can be found with:  
+```python
+from pwn import *
+context.binary = elf = ELF("./vuln")
+bss_section = elf.symbols.__bss_start
+```
