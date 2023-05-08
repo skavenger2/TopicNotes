@@ -130,3 +130,6 @@ from pwn import *
 context.binary = elf = ELF("./vuln")
 bss_section = elf.symbols.__bss_start
 ```
+
+## Stack Pivoting
+
