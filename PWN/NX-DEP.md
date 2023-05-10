@@ -158,7 +158,7 @@ If we then call `leave; ret;` again, RBP is moved into RSP, thus giving us contr
 ```python3
 from pwn import *
 rop.raw([
-    b"A" * rbp_offset, # eip control - 8 (4 for 32bit)
+    b"A" * rbp_offset, # rip control - 8 (4 for 32bit)
     new_stack_addr,
     leave_ret,
 ])
