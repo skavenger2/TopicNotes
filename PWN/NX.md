@@ -1,4 +1,4 @@
-# No eXecute / Data Execution Prevention
+# No eXecute
 
 ## ret2libc
 
