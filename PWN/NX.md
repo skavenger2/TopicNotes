@@ -26,6 +26,28 @@ Stack setup:
 3. Return address to be restored after executing the function, i.e. exit() (or anything if we don't care about a graceful exit)
 4. Arguments for the target function
 
+---
+
+Find the offest to `system()` in libc, from the base of libc (the path can be found after using `ldd` on th etarget binary with:  
+
+`readelf -s <libc_path>`  
+
+Additionally find the offset to a function that is present in the binary, e.g. `puts()`.  
+You can leak the address of `puts`, subtract the offset of `puts` from the `puts` address to get the libc base address,  
+the add the offset of `system()` to the base address and call that.  
+Search for "/bin/sh" in libc and follow the above steps - alternatively, use a write-what-where gadget to store "/bin/sh" in memory.  
+
+Can also import libc into pwntools to automate searching for functions, just need to set the libc base address (run `ldd` on the target binary):  
+
+```python3
+from pwn import *
+
+libc = ELF("</path/to/libc.so>")
+libc.address = 0x<ldd_output>
+system_function = libc.symbols.system
+bin_sh = next(libc.search(b'/bin/sh\x00'))
+```
+
 ### System() Example
 No ASLR  
 ---
