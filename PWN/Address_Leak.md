@@ -1,5 +1,12 @@
 # Leak an Address
 
+Use `printf` or `puts` to print out a function address from libc.  
+Can then calculate the offset of that function from the base.  
+Calculate the offset of a desired function and add that to the libc base,  
+you can then call that function directly.  
+
+`readelf -s <libc_path>` will show function offsets.  
+
 ## Address Leak to Call a Non-Imported Function
 
 *Setup: a desired function is in a shared library but is not called in the binary.*  
