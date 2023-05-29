@@ -28,7 +28,7 @@ Stack setup:
 
 ---
 
-Find the offest to `system()` in libc, from the base of libc (the path can be found after using `ldd` on th etarget binary with:  
+Find the offest to `system()` in libc, from the base of libc (the path can be found after using `ldd` on the target binary with:  
 
 `readelf -s <libc_path>`  
 
