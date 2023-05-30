@@ -97,7 +97,7 @@ Stephen Sims - Return Oriented Shellcode (SANS SEC760 Content)
 Automate finding gadgets <https://github.com/packz/ropeme>  
 
 Overflow a buffer to control the EIP/RIP.  
-From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers, followed by an `int 0x80` to switch to kernel mode and execute the system call.  
+From the EIP/RIP onwards, place the address of the instructions you are using and any values that need to be popped into registers, followed by an (32bit: `int 0x80` or 64bit: `syscall`) to switch to kernel mode and execute the system call.  
 
 You can view the available gadgets in a program with `ropper`  
 E.g. `ropper -f vuln` to view all of the gadgets in a binary.  
