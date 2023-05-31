@@ -53,6 +53,11 @@ Receive the output of `puts` and carve out the address:
 io.recvuntil(b"whatever\n")   # bytes preceeding the leak
 leaked_addresses = io.recv()    # receive data until the next input. Likely to contain more than 1 address -> the first is the one we want
 foothold_leak = unpack(leaked_addresses[:4])    # read the first 4 bytes (32bit address. [:8] for 64bit addresses
+
+# 64 bit variation
+leak = address[:6]
+leak += b"\x00\x00"
+print(f"Leaked address: {hex(unpack(leak))}")
 ```
 
 Calculate the offset to the desired function by first calculating the shared libraries base,  
