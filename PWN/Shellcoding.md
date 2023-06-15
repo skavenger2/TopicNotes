@@ -1,7 +1,5 @@
 # Shellcoding
 
-Can be written in C before compiling, or in Assembly.  
-
 Use ASM instructions to set up the stack for your desired actions.  
 Compile the program and use `objdump` to pull apart the binary and get the opcodes (shellcode).  
 
