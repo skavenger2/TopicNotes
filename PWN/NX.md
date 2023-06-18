@@ -85,6 +85,7 @@ Determine the version of libc in use:
 `ldd <target_binary>`  
 Find offsets to useful functions:  
 `readelf -W -s <libc_file>`  
+Find the offset to "/bin/sh" with `strings -t x -a /libc/path | grep "/bin"`  
 
 ```python3
 # Offsets
