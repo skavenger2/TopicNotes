@@ -38,3 +38,13 @@ If those links no longer work, the steps include:
 1. Deflate
 2. Base64 encode
 3. URL encode
+
+## Comment Injection
+
+In some cases, comments are ignored when verifying the signature, AND the comment and everything after it is removed when retreiving the NameID.  
+
+If you want to impersonate `admin@example.com`, register an account with `admin@example.com.test.com`.  
+Log in to th eidentity provider and interpcept requests with "Burp Suite" and the "SAML Raider" extension.  
+Edit the `SAMLResponse` by injecting a comment in the email address field:  
+`admin@example.com.test.com` becomes `admin@example.com<!--HACK-->.test.com`.  
+If the service provider ignores the comment and everything after it, this should allow you to impersonate the target user.  
