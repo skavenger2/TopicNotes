@@ -19,3 +19,22 @@ This should allow impersonation.
 ## Certificate Not Checked
 
 Same steps as for `Known Key`, but provide any matching certificate and key.  
+
+## SAMLResponse Forwarding
+
+Decode the `SAMLResponse` to change the destination before re-encoding and submitting it to the target service provider.  
+The following tools can be used to decode and re-encode:  
+<https://www.samltool.com/decode.php>  
+<https://www.samltool.com/encode.php>  
+If those links no longer work, the steps include:  
+**Decode SAMLRequest:**  
+
+1. URL decode
+2. Base64 decode
+3. Inflate
+
+**Encode SAMLRequest:**  
+
+1. Deflate
+2. Base64 encode
+3. URL encode
