@@ -48,3 +48,10 @@ Log in to th eidentity provider and interpcept requests with "Burp Suite" and th
 Edit the `SAMLResponse` by injecting a comment in the email address field:  
 `admin@example.com.test.com` becomes `admin@example.com<!--HACK-->.test.com`.  
 If the service provider ignores the comment and everything after it, this should allow you to impersonate the target user.  
+
+## Signature Wrapping
+
+Create an account and log in to the Service Provider with SAML.  
+Intercept the SAMLResponse with Burp Suite and SAML Raider.  
+Select `XSW1` in XSW Attacks and click `Apply XSW`.  
+Change the first instacnce of you email address, to the target email address and forward the request, hopefully the second is verified but the first is used.  
