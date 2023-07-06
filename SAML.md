@@ -15,3 +15,7 @@ Import `cert.pem` and click `Traditional RSA PEM...` to load the rsa.pem file.
 Go through the apps auth flow again and intercept the request with the SAML Response.  
 Search for the value you want to change, change it and click `(Re-)Sign Assertion` before forwarding the request.  
 This should allow impersonation.  
+
+## Certificate Not Checked
+
+Same steps as for `Known Key`, but provide any matching certificate and key.  
