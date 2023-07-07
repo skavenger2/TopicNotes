@@ -83,5 +83,13 @@ curl -H 'Authorization: Bearer [TOKEN]' [RESOURCE_SERVER]/api/keys --dump-header
 
 ```
 
+## State Fixation with CSRF
 
+Exploiting an OAuth2 Client that is vulnerbale to state fixation and CSRF in the link functionality.  
 
+Create an HTML page that will:  
+- Prime the victim's session with a state
+- Pass a valid code with the fixated state
+
+Create a malicious account that will be used for the link, begin the OAuth2 dance but intercept requests and stop before the final redirect with the valid code.  
+Look through the request history for a request that primes the session with a state, e.g. 
