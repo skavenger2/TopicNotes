@@ -53,5 +53,5 @@ If the service provider ignores the comment and everything after it, this should
 
 Create an account and log in to the Service Provider with SAML.  
 Intercept the SAMLResponse with Burp Suite and SAML Raider.  
-Select `XSW1` in XSW Attacks and click `Apply XSW`.  
-Change the first instacnce of you email address, to the target email address and forward the request, hopefully the second is verified but the first is used.  
+Select `XSW1` (iterate through numbers if one dosn't work) in XSW Attacks and click `Apply XSW`.  
+Change the first or last instacnce of your email address, to the target email address and forward the request, hopefully the second is verified but the first is used (or vice versa).  
