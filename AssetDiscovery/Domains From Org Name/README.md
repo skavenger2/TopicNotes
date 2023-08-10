@@ -14,4 +14,4 @@ Domain:
 ## Dependencies
 
 jq  
-`sudp apt install jq`  
+`sudo apt install jq`  
