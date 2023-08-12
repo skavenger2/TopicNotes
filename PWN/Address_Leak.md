@@ -5,6 +5,7 @@ Can then calculate the offset of that function from the base.
 Calculate the offset of a desired function and add that to the libc base,  
 you can then call that function directly.  
 
+Determine the used libc with `ldd <target_binary>`.  
 `readelf -s <libc_path>` will show function offsets.  
 
 ## Address Leak to Call a Non-Imported Function
