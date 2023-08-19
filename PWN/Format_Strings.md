@@ -22,8 +22,8 @@ Using the above example: `aaaabbbb.%10$x.%11$x` becomes: `aaaabbbb.61616161.6262
 When the `%n` is encountered during printf processing, the number of characters up to the current point  
 are written to the address argument corresponding to the format specifier.  
 
-E.g. `\xc8\x97\x04\x08.%x.%x.%.100x.%n` would write the integer `110` to the address `0x080497c8`.  
-Each byte in the address counts as 1, each %x counts as 1, each '.' counts as 1, and the `%.100x` counts for 100.  
+E.g. `\xc8\x97\x04\x08.%x.%x.%100x.%n` would write the integer `110` to the address `0x080497c8`.  
+Each byte in the address counts as 1, each %x counts as 1, each '.' counts as 1, and the `%100x` counts for 100.  
 Address = 4,  
 %x's = 2,  
 '.' = 4,  
@@ -38,6 +38,8 @@ Ghidra (or another disassembler) can be used.
 `objdump -R <vulnerable_binary> | grep <function_after_printf)` will find that functions address within the binary (linux PIE disabled).  
 Or open the binary in GBD, break on main (or anywhere) and run the binary, then type `got` into GDB and  
 look for the desired function to overwrite (also PIE disabled).  
+
+ANother method to find addresses is: `objdump -D <binary> | grep <function>`  
 
 ## Multiple Writes
 
@@ -141,3 +143,22 @@ E.g.:
 flag{flag}
 
 ```
+
+## Overwriting Destructors
+
+Destructors run after main() exits by calling exit().  
+Descructors can be found in a number of sections:  
+
+- .dtors
+- .fini
+- .fini_array
+
+Find them in an binary that does not have PIE enabled:  
+
+- Objdump - `objdump -D <binary> | grep fini`
+- Ghidra - see the "Program Trees" window
+- In GDB - `info file`
+
+Write an address into the destructors section of a function you want to call.  
+
+## Overwrite a function 
