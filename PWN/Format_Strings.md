@@ -162,3 +162,6 @@ Find them in an binary that does not have PIE enabled:
 Write an address into the destructors section of a function you want to call.  
 
 ## Overwrite a function 
+
+Find the function you want to overwrite, within the GOT (can find with `Ghidra`). Overwrite this pointer with the  
+address to the desired functions PLT address (can find with `objdump`), e.g. system@plt.  
