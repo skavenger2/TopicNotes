@@ -147,7 +147,7 @@ flag{flag}
 ## Overwriting Destructors
 
 Destructors run after main() exits by calling exit().  
-Descructors can be found in a number of sections:  
+Destructors can be found in a number of sections:  
 
 - .dtors
 - .fini
@@ -155,9 +155,11 @@ Descructors can be found in a number of sections:
 
 Find them in an binary that does not have PIE enabled:  
 
-- Objdump - `objdump -D <binary> | grep fini`
-- Ghidra - see the "Program Trees" window
-- In GDB - `info file`
+- Objdump   - `objdump -D <binary> | grep fini`
+- Ghidra    - see the "Program Trees" window
+- In GDB    - `info file`
+- nm        - `nm <binary>`
+- readelf   - `readelf -S <binary>`
 
 Write an address into the destructors section of a function you want to call.  
 
