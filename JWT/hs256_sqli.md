@@ -13,6 +13,9 @@ database identifier, attempt an SQL injection:
 
 Change the "kid" value to an injection: `aaa' union select 'bbb`  
 and set the secret to be `bbb`.  
+Hopefully the server checks for the secret to be the union selected value.  
+
+Full script:  
 
 ```python3
 # python3
