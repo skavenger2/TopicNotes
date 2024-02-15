@@ -44,7 +44,7 @@ Linux machine -> jump box -> attack server -> rdp machine
 
 Create a port forward from the jump box to rdp machine via the attack server:  
 
-`ssh -L 1234:<rdp machine ip>:3389` - change `1234` to any unused port on the jump box, port `3389` on the rdp machine for rdp  
+`ssh -L 1234:<rdp machine ip>:3389 user@attack-server` - change `1234` to any unused port on the jump box, port `3389` on the rdp machine for rdp  
 
 Create a port forward from the linux machine to the jump box, using the port in the previous command:  
 
