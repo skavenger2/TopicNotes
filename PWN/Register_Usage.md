@@ -6,7 +6,7 @@ Reference: http://6.s081.scripts.mit.edu/sp18/x86-64-architecture-guide.html
 
 | Register | Purpose |
 | --- | --- |
-| %rax	temp register; return value |
+| %rax | temp register; return value |
 | %rbx | callee-saved |
 | %rcx | used to pass 4th argument to functions |
 | %rdx |used to pass 3rd argument to functions |
