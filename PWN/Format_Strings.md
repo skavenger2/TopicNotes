@@ -129,6 +129,12 @@ payload = flat ([
 
 Observe the value of the pointer now contains: `x/2wx 0x0804a028` = `0x0804870b` our desired value.  
 
+## Writing Sizes
+
+`%n` - 4 bytes  
+`%hn` - 2 bytes (LSBs)  
+`%hhn` - 1 byte (LSB)  
+
 ## Read Strings From the Stack
 
 If you have a format string bug and can dump hex values, you can begin to inspect any pointers to strings  
